@@ -7,6 +7,7 @@ public class ThirdPersonController : MonoBehaviour
 {
     #region 变量
     Transform playerTransform;
+    Animator Animator;
     Transform cameraTransform;
 
     //移动输入
@@ -27,10 +28,29 @@ public class ThirdPersonController : MonoBehaviour
     };
     public PlayerPosture playerPosture = PlayerPosture.Stand;
 
+    //保存运动状态
+    public enum LocomotionState
+    {
+        Idle,
+        Walk,
+        Run
+    };
+    public LocomotionState locomotionState = LocomotionState.Idle;
+
+    public enum ArmState
+    {
+        Normal,
+        Aim
+    };
+    public ArmState armState = ArmState.Normal;
+
+
     // Start is called before the first frame update
     void Start()
     {
-
+        //一坨引用
+        playerTransform = transform;
+        cameraTransform = Camera.main.transform;
     }
 
     // Update is called once per frame
@@ -56,4 +76,43 @@ public class ThirdPersonController : MonoBehaviour
         isAiming = ctx.ReadValueAsButton();
     }
     #endregion
+    
+    //切换玩家状态
+    void SwitchPlayerState()
+    {
+        //下蹲
+        if (isCrouch)
+        {
+            playerPosture = PlayerPosture.Crouch;
+        }
+        else
+        {
+            playerPosture = PlayerPosture.Stand;
+        }
+        //待机动画
+        if (moveInput.magnitude == 0)
+        {
+            locomotionState = LocomotionState.Idle;
+        }
+        //奔跑
+        else if (!isRunning)
+        {
+            locomotionState = LocomotionState.Walk;
+        }
+        else
+        {
+            locomotionState = LocomotionState.Run;
+        }
+        //瞄准
+        if (isAiming)
+        {
+            armState = ArmState.Aim;
+        }
+        else
+        {
+            armState = ArmState.Normal;
+        }
+    }
+
+
 }
